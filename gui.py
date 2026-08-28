@@ -6,6 +6,7 @@ layerize JSON을 붙여넣고 Run을 누르면 make_psd.build_psd로 PSD를 생�
 
 import json
 import locale
+import os
 import queue
 import sys
 import threading
@@ -78,6 +79,18 @@ def resource_path(name: str) -> Path:
     return Path(getattr(sys, '_MEIPASS', Path(__file__).parent)) / name
 
 
+def default_folder() -> Path:
+    """기본 출력 폴더. 원칙은 cwd — 탐색기 더블클릭 시 cwd가 exe 폴더가 되므로
+    두 경우 모두 커버된다. 단 바로가기 등으로 cwd가 시스템 폴더에 떨어지는
+    frozen exe만 exe 폴더로 폴백한다."""
+    cwd = Path.cwd()
+    if getattr(sys, 'frozen', False):
+        windir = Path(os.environ.get('WINDIR', r'C:\Windows'))
+        if cwd == windir or windir in cwd.parents:
+            return Path(sys.executable).parent
+    return cwd
+
+
 def default_lang() -> str:
     loc = (locale.getdefaultlocale()[0] or '').lower()
     for code in ('ko', 'ja'):
@@ -135,7 +148,7 @@ class App:
         form.columnconfigure(1, weight=1)
         self.out_label = ttk.Label(form)
         self.out_label.grid(row=0, column=0, sticky='w')
-        self.folder_var = tk.StringVar(value=str(Path.cwd()))
+        self.folder_var = tk.StringVar(value=str(default_folder()))
         ttk.Entry(form, textvariable=self.folder_var).grid(
             row=0, column=1, sticky='ew', padx=6
         )
