@@ -1,84 +1,86 @@
-# TECH — 순수 Python으로 임베디드 스마트 오브젝트 PSD 생성하기
+# TECH — Creating embedded Smart Object PSDs in pure Python
 
-Photoshop 없이 Python만으로, Photoshop이 정상 인식하는 **임베디드 스마트 오브젝트 레이어 PSD**를 생성하는 기법 정리다. psd-tools 1.18 기준이며, 이 저장소의 `make_psd.py`가 실제 구현체다.
+*Read this in other languages: [한국어](TECH.ko.md)*
 
-## 1. 문제
+Notes on generating a PSD with **embedded Smart Object layers** that Photoshop recognizes as fully valid — in Python only, with no Photoshop installation. Based on psd-tools 1.18; `make_psd.py` in this repository is the working implementation.
 
-psd-tools의 고수준 API는 스마트 오브젝트를 *읽기*만 지원하고 생성·편집은 미지원이다. 다른 선택지도 마땅치 않다:
+## 1. The problem
 
-| 방법 | 한계 |
+psd-tools' high-level API only supports *reading* Smart Objects, not creating or editing them. The alternatives are not great either:
+
+| Approach | Limitation |
 |---|---|
-| pytoshop | 래스터 레이어만 |
-| Aspose.PSD | 상용, 평가판 워터마크 |
-| ag-psd (TypeScript) | 쓰기 지원하나 Node 스택 필요 |
-| Photoshop COM/JSX | 확실하지만 Photoshop 설치 필수 |
+| pytoshop | Raster layers only |
+| Aspose.PSD | Commercial; evaluation watermark |
+| ag-psd (TypeScript) | Supports writing, but requires a Node stack |
+| Photoshop COM/JSX | Reliable, but requires Photoshop installed |
 
-그러나 psd-tools의 **저수준 계층**(`psd_tools.psd`)은 스마트 오브젝트 관련 블록을 완전히 파싱하고 바이트로 재직렬화(라운드트립)할 수 있다. 즉 "만들어주는 API"는 없지만, 구조체를 직접 조립하면 직렬화는 라이브러리가 해준다.
+However, psd-tools' **low-level layer** (`psd_tools.psd`) fully parses the Smart Object-related blocks and can re-serialize them byte-for-byte (round-trip). In other words: there is no "create it for me" API, but if you assemble the structures yourself, the library handles serialization.
 
-## 2. PSD 스마트 오브젝트의 바이너리 구조
+## 2. The binary structure of a PSD Smart Object
 
-스마트 오브젝트 레이어 = 일반 래스터 레이어 + 태그 블록 3종.
+A Smart Object layer = a regular raster layer + three tagged blocks.
 
-### 2.1 레이어별 태그 블록
+### 2.1 Per-layer tagged blocks
 
-**`SoLd`** (`Tag.SMART_OBJECT_LAYER_DATA1`, kind=`soLD`, version=4) — Descriptor 하나를 담는다. 주요 키:
+**`SoLd`** (`Tag.SMART_OBJECT_LAYER_DATA1`, kind=`soLD`, version=4) — contains a single Descriptor. Key entries:
 
-| 키 | 타입 | 값 |
+| Key | Type | Value |
 |---|---|---|
-| `Idnt` | String | 전역 `lnk2` 아이템과 매칭되는 UUID + `'\x00'` |
-| `placed` | String | 배치 인스턴스 UUID + `'\x00'` |
-| `Trnf`, `nonAffineTransform` | List[8×Double] | 배치 사각형 코너 **TL→TR→BR→BL** 순 `[x1,y1, x2,y1, x2,y2, x1,y2]` |
-| `Sz  ` | Descriptor(`Pnt `) | 원본 콘텐츠 크기 `Wdth`/`Hght` |
-| `warp` | Descriptor(`warp`) | warpNone, `bounds`=classFloatRect(0,0,원본h,원본w) |
-| 기타 | | `Annt`=16, `Type`=2, `Rslt`=72(UnitFloat `#Rsl`), PgNm/totalPages/Crop/frameStep/duration/frameCount, comp=-1, ClMg |
+| `Idnt` | String | UUID matching the global `lnk2` item, + `'\x00'` |
+| `placed` | String | Placement-instance UUID + `'\x00'` |
+| `Trnf`, `nonAffineTransform` | List[8×Double] | Placement corners in **TL→TR→BR→BL** order: `[x1,y1, x2,y1, x2,y2, x1,y2]` |
+| `Sz  ` | Descriptor(`Pnt `) | Original content size `Wdth`/`Hght` |
+| `warp` | Descriptor(`warp`) | warpNone, `bounds`=classFloatRect(0,0,srcH,srcW) |
+| others | | `Annt`=16, `Type`=2, `Rslt`=72 (UnitFloat `#Rsl`), PgNm/totalPages/Crop/frameStep/duration/frameCount, comp=-1, ClMg |
 
-**`PlLd`** (`Tag.PLACED_LAYER2`, kind=`plcL`, version=3) — 구버전 호환 블록. uuid(bytes), transform(8 doubles, SoLd와 동일 코너), anti_alias=16, layer_type=RASTER(2), warp(DescriptorBlock2).
+**`PlLd`** (`Tag.PLACED_LAYER2`, kind=`plcL`, version=3) — legacy-compatibility block. uuid (bytes), transform (8 doubles, same corners as SoLd), anti_alias=16, layer_type=RASTER(2), warp (DescriptorBlock2).
 
-레이어의 래스터 채널에는 **배치 결과 프리뷰**(원본을 배치 크기로 리사이즈한 픽셀)를 넣는다. Photoshop은 열 때 이 프리뷰를 그대로 쓰므로, 프리뷰가 곧 눈에 보이는 결과다.
+The layer's raster channels hold the **placement preview** (the source image resized to its placed size). Photoshop renders this preview as-is when opening the file, so the preview *is* what you see.
 
-### 2.2 전역 태그 블록: `lnk2`
+### 2.2 Global tagged block: `lnk2`
 
-`LayerAndMaskInformation.tagged_blocks`의 `Tag.LINKED_LAYER2`. 각 아이템(`LinkedLayer`)이 임베디드 파일 하나다:
+`Tag.LINKED_LAYER2` in `LayerAndMaskInformation.tagged_blocks`. Each item (`LinkedLayer`) is one embedded file:
 
-- kind=`liFD`(DATA), version=8
-- uuid(pascal string) — 레이어 `SoLd.Idnt`와 매칭
-- filename(unicode, 널 종결 포함), filetype=`b'png '`
-- **data = 원본 파일 바이트 통째로** (PNG면 PNG 그대로)
+- kind=`liFD` (DATA), version=8
+- uuid (pascal string) — matches the layer's `SoLd.Idnt`
+- filename (unicode, including the null terminator), filetype=`b'png '`
+- **data = the original file bytes, verbatim** (a PNG stays a PNG)
 - open_file = DescriptorBlock `{compInfo: {compID: -1, originalCompID: -1}}`
 - child_id=`'\x00'`, mod_time=0.0, lock_state=0
-- **꼬리에 `{contentID: <uuid>}` DescriptorBlock** ← §4의 함정
+- **a trailing `{contentID: <uuid>}` DescriptorBlock** ← the trap in §4
 
-참고: PSD(v1)에서 `lnk2` 블록의 길이 필드는 4바이트다 (8바이트는 PSB에서만).
+Note: in PSD (v1) the `lnk2` block's length field is 4 bytes (8 bytes only in PSB).
 
-## 3. 구현 전략
+## 3. Implementation strategy
 
-### 3.1 디스크립터는 손으로 짓지 말고 템플릿을 패치하라
+### 3.1 Don't hand-build the descriptors — patch a template
 
-SoLd 디스크립터는 필드 타입(UnitFloat 단위, Enumerated typeID 등)·순서·이름 관례(`'\x00'` 종결)를 하나라도 틀리면 Photoshop이 거부할 수 있다. 안전한 방법:
+The SoLd descriptor is unforgiving: get one field type (UnitFloat units, Enumerated typeIDs), ordering, or naming convention (`'\x00'` terminators) wrong and Photoshop may reject the file. The safe approach:
 
-1. Photoshop으로 스마트 오브젝트 1개짜리 참조 PSD를 한 번 만든다 (개발 시 1회)
-2. psd-tools로 `SoLd`/`PlLd`/`open_file`/`contentID` 블록 바이트를 추출해 **base64 상수로 코드에 임베드**
-3. 런타임엔 `SmartObjectLayerData.read()`로 템플릿을 파싱한 뒤 UUID·`Trnf`·`Sz  `·warp bounds만 패치
+1. Use Photoshop once (at development time) to create a reference PSD containing a single Smart Object
+2. Extract the `SoLd`/`PlLd`/`open_file`/`contentID` block bytes with psd-tools and **embed them as base64 constants in the code**
+3. At runtime, parse the template with `SmartObjectLayerData.read()` and patch only the UUIDs, `Trnf`, `Sz  `, and warp bounds
 
-최종 실행엔 Photoshop이 전혀 필요 없다.
+The final script needs no Photoshop at all.
 
-### 3.2 래스터 부분은 psd-tools 1.18 신규 API 활용
+### 3.2 Use psd-tools 1.18's new APIs for the raster part
 
-- `PSDImage.new('RGB', size)`로 문서 생성. RGB 문서에서도 레이어별 투명 채널(-1)은 표준이다.
-- `PixelLayer._build_layer_record_and_channels(rgba_image, name, left, top, Compression.RLE)` — **RGBA 이미지를 넘기면 알파가 TRANSPARENCY_MASK(-1) 채널로 들어간다.** 공개 API `PixelLayer.frompil()`은 RGB 문서에서 알파를 레이어 마스크로 변환해버리므로 부적합.
-- `psd.append(PixelLayer(psd, record, channels))` — append 순서가 아래→위.
-- `psd.save()`가 채널 길이 재계산과 합성 프리뷰(ImageData) 갱신을 자동 수행한다.
-- 유니코드 레이어명: `record.tagged_blocks.set_data(Tag.UNICODE_LAYER_NAME, name)`.
+- Create the document with `PSDImage.new('RGB', size)`. Per-layer transparency channels (-1) are standard even in RGB documents.
+- `PixelLayer._build_layer_record_and_channels(rgba_image, name, left, top, Compression.RLE)` — **passing an RGBA image stores the alpha as the TRANSPARENCY_MASK (-1) channel.** The public `PixelLayer.frompil()` is unsuitable here: on RGB documents it converts the alpha into a layer mask instead.
+- `psd.append(PixelLayer(psd, record, channels))` — append order is bottom→top.
+- `psd.save()` automatically recomputes channel lengths and refreshes the composite preview (ImageData).
+- Unicode layer names: `record.tagged_blocks.set_data(Tag.UNICODE_LAYER_NAME, name)`.
 
-## 4. ★ psd-tools 버그: LinkedLayer v8 `contentID` 누락
+## 4. ★ psd-tools bug: missing LinkedLayer v8 `contentID`
 
-**증상**: 생성한 PSD를 Photoshop이 *"파일이 이 버전의 Photoshop과 호환되지 않습니다"* 라며 열기 자체를 거부한다.
+**Symptom**: Photoshop refuses to open the generated PSD at all — *"the file is not compatible with this version of Photoshop"*.
 
-**재현**: Photoshop이 만든 (스마트 오브젝트 포함) PSD를 psd-tools로 읽고 **수정 없이 재저장만 해도** 동일하게 거부된다. 즉 라이브러리 쓰기 경로의 버그다.
+**Reproduction**: take a PSD created by Photoshop (containing a Smart Object), read it with psd-tools, and **re-save it without any modification** — Photoshop rejects it the same way. So the bug is in the library's write path.
 
-**원인**: `LinkedLayer` version 8은 표준 필드(lock_state) 뒤에 `{contentID: <uuid>}` DescriptorBlock(~117B)이 붙는데, psd-tools의 `LinkedLayer.read`는 이를 파싱하지 않는다. 각 아이템이 길이 블록 안에 있어 읽기는 문제없이 넘어가지만(잔여 바이트 폐기), **재작성 시 이 꼬리가 누락**되고 Photoshop의 lnk2 v8 파서가 실패한다.
+**Cause**: `LinkedLayer` version 8 carries a `{contentID: <uuid>}` DescriptorBlock (~117 bytes) after the standard fields (lock_state), which psd-tools' `LinkedLayer.read` never parses. Reading still succeeds because each item sits inside a length block (the unread tail is silently discarded), but **on re-write the tail is lost** and Photoshop's lnk2 v8 parser fails.
 
-**우회**: `LinkedLayer` 서브클래스에서 `write()`를 오버라이드해 contentID DescriptorBlock 바이트를 덧붙인다:
+**Workaround**: subclass `LinkedLayer` and override `write()` to append the contentID DescriptorBlock:
 
 ```python
 class LinkedLayerV8(LinkedLayer):
@@ -89,18 +91,18 @@ class LinkedLayerV8(LinkedLayer):
         return written + blk.write(fp, padding=1)
 ```
 
-바이너리 diff로 찾는 과정: 원본 vs 재저장본의 섹션별 길이를 비교해 116바이트 손실이 전부 `lnk2` 블록 안임을 확인 → 아이템 필드를 수동 파싱해 소비되지 않은 꼬리 117바이트를 특정 → hexdump에서 `contentID` 디스크립터 확인.
+How it was tracked down with binary diffing: compared per-section lengths of the original vs. the re-saved file to confirm the 116-byte loss was entirely inside the `lnk2` block → manually parsed the item's fields to isolate a 117-byte unconsumed tail → identified the `contentID` descriptor in the hexdump.
 
-## 5. 검증 방법론
+## 5. Verification methodology
 
-3단계로 검증했다. 손으로 조립한 포맷은 마지막 단계가 필수다:
+Three stages; for a hand-assembled format the last one is mandatory:
 
-1. **psd-tools 재파싱** — 고수준 API가 레이어를 `SmartObjectLayer`로 분류하는지, 임베디드 바이트가 원본과 일치하는지
-2. **픽셀 비교** — `psd.composite()` 결과를 기대 이미지와 diff
-3. **실제 Photoshop으로 열기** — psd-tools는 관대해서 1·2를 통과해도 Photoshop이 거부할 수 있다 (§4가 정확히 그 사례). COM/JSX 자동화 시 `app.displayDialogs = DialogModes.NO`를 반드시 먼저 설정할 것 — 안 하면 오류가 모달로 떠서 COM 호출이 `RPC_E_SERVERCALL_RETRYLATER`로 무한 대기한다.
+1. **psd-tools re-parse** — does the high-level API classify the layers as `SmartObjectLayer`, and do the embedded bytes match the originals?
+2. **Pixel comparison** — diff `psd.composite()` against the expected image
+3. **Open it in real Photoshop** — psd-tools is lenient, so passing 1 and 2 does not guarantee Photoshop accepts the file (§4 is exactly such a case). When automating via COM/JSX, set `app.displayDialogs = DialogModes.NO` first — otherwise errors surface as modal dialogs, and COM calls hang forever with `RPC_E_SERVERCALL_RETRYLATER`.
 
-## 6. 한계
+## 6. Limitations
 
-- 축정렬 배치(이동·스케일)만 구현했다. `Trnf`가 임의 사각형 코너를 받으므로 회전·시어도 포맷상 가능하다.
-- 임베디드(liFD)만 다룬다. 외부 링크 파일(liFE)은 별도 구조.
-- 템플릿은 Photoshop 27.x 출력 기준. 훗날 버전에서 필드가 추가되면 참조 PSD를 다시 추출하면 된다.
+- Only axis-aligned placement (translate/scale) is implemented. `Trnf` accepts arbitrary quad corners, so rotation/shear are possible format-wise.
+- Embedded (liFD) only. Externally linked files (liFE) use a different structure.
+- Templates were captured from Photoshop 27.x output. If a future version adds fields, re-extract from a fresh reference PSD.

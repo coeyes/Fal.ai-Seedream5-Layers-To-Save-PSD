@@ -1,31 +1,33 @@
 # seedream5_layer
 
-seedream5pro **layerize** 결과 JSON을 입력받아, AI가 분리한 오브젝트 레이어들을 **임베디드 스마트 오브젝트**로 쌓은 PSD를 생성하는 도구다. Photoshop 설치 없이 순수 Python으로 동작한다.
+*Read this in other languages: [한국어](README.ko.md)*
 
-## 개요
+A tool that takes a seedream5pro **layerize** result JSON and builds a PSD where each AI-separated object layer is an **embedded Smart Object**. Runs on pure Python — no Photoshop installation required.
 
-seedream5pro layerize는 한 장의 이미지를 AI로 오브젝트별 레이어(투명 PNG)로 분해하고, 각 레이어의 URL·이름·배치 정보(bounding box)를 JSON으로 내려준다. 이 도구는 그 JSON을 받아:
+## Overview
 
-1. 각 레이어 PNG를 다운로드하고
-2. `z_index=0`(배경, 이름 없음 → `background`) 크기로 PSD 캔버스를 만들고
-3. 각 PNG를 **고해상도 원본 그대로 임베드한 스마트 오브젝트**로 만들어, bounding box 위치·크기로 트랜스폼 배치해 z_index 순서로 쌓는다
+seedream5pro layerize decomposes a single image into per-object layers (transparent PNGs) using AI, and returns a JSON describing each layer's URL, name, and placement (bounding box). This tool takes that JSON and:
 
-레이어 PNG는 최종 배치 크기보다 약 2배 고해상도라서, 스마트 오브젝트로 임베드하면 포토샵에서 확대·재배치해도 화질 손실이 없다.
+1. Downloads each layer PNG
+2. Creates a PSD canvas sized to the `z_index=0` layer (the background; its name is `null`, so it becomes `background`)
+3. Embeds each PNG **at its original high resolution as a Smart Object**, transform-placed at its bounding box, stacked in `z_index` order
 
-## 사용법
+The layer PNGs are roughly 2× higher resolution than their final placement size, so embedding them as Smart Objects means no quality loss when scaling or repositioning them later in Photoshop.
+
+## Usage
 
 ```bat
 .venv\Scripts\activate
-python make_psd.py layer.json          @REM layer.psd + layer.psd_layers/ 생성
+python make_psd.py layer.json          @REM creates layer.psd + layer.psd_layers/
 python make_psd.py layer.json -o my.psd
-python make_psd.py layer.json --gen-layers-folder 0   @REM PSD만 생성
+python make_psd.py layer.json --gen-layers-folder 0   @REM PSD only
 ```
 
-출력 기본값은 `<json 파일명>.psd` (예: `layer.json` → `layer.psd`).
+The default output is `<json stem>.psd` (e.g. `layer.json` → `layer.psd`).
 
-기본으로 `<output.psd>_layers` 폴더에 각 레이어 원본 PNG를 `<zindex>_<layername>.png`로 함께 저장한다. 레이어 이름의 파일명 금지 문자는 `_`로 치환되고, 대소문자 무시 중복(z0의 `background` 포함)은 `_2`, `_3` 접미사로 구분된다.
+By default, each layer's original PNG is also saved to a `<output.psd>_layers` folder as `<zindex>_<layername>.png`. Characters invalid in filenames are replaced with `_`, and case-insensitive duplicates (including the reserved `background` name from z0) are disambiguated with `_2`, `_3`, ... suffixes.
 
-## 설치
+## Install
 
 ```bat
 uv venv --seed
@@ -33,20 +35,20 @@ uv venv --seed
 uv pip install -r requirements.txt
 ```
 
-의존성: `psd-tools`, `pillow` (Python 3.12에서 테스트).
+Dependencies: `psd-tools`, `pillow` (tested on Python 3.12).
 
-## 동작 원리 (요약)
+## How it works (summary)
 
-psd-tools는 스마트 오브젝트 *생성*을 공식 지원하지 않는다. 이 도구는 psd-tools의 저수준 직렬화 계층을 이용해 스마트 오브젝트 블록(`SoLd`, `PlLd`, 전역 `lnk2`)을 직접 조립한다. 디스크립터 구조는 Photoshop이 실제로 기록한 바이너리를 base64 템플릿으로 임베드해 두고, uuid·트랜스폼·크기만 런타임에 패치하는 방식이라 견고하다.
+psd-tools does not officially support *creating* Smart Objects. This tool uses psd-tools' low-level serialization layer to assemble the Smart Object blocks (`SoLd`, `PlLd`, and the global `lnk2`) directly. The descriptor structures are embedded as base64 templates captured from binaries actually written by Photoshop, with only the UUIDs, transform, and sizes patched at runtime — which makes the approach robust.
 
-또한 psd-tools의 알려지지 않은 버그 — `LinkedLayer` v8 꼬리의 `contentID` 디스크립터를 누락 기록해 **Photoshop이 파일을 아예 열지 못하게 되는 문제** — 를 `LinkedLayerV8` 서브클래스로 우회한다. 포맷 구조, 템플릿 패치 전략, 버그 규명 과정 등 기술 상세는 [TECH.md](TECH.md) 참조.
+It also works around a previously unreported psd-tools bug — the `contentID` descriptor at the tail of `LinkedLayer` v8 is dropped on write, which makes **Photoshop refuse to open the file entirely** — via a `LinkedLayerV8` subclass. See [TECH.md](TECH.md) for the format details, the template-patching strategy, and how the bug was tracked down.
 
-## 검증
+## Verification
 
-Photoshop 27.6에서 실제로 열어 8개 레이어 전부 `LayerKind.SMARTOBJECT`로 인식됨을 확인했고, 포토샵이 flatten-export한 PNG(`ps_export.png`)가 기대 썸네일(`final_thumb.png`)과 일치한다. psd-tools 재파싱 검증 스크립트는 `_ref/verify.py`.
+Opened the output in Photoshop 27.6: all 8 layers are recognized as `LayerKind.SMARTOBJECT`, and the PNG that Photoshop itself flatten-exports (`ps_export.png`) matches the expected thumbnail (`final_thumb.png`). The psd-tools re-parsing check lives in `_ref/verify.py`.
 
-## 파일
+## Files
 
-- `make_psd.py` — 메인 스크립트
-- `layer.json` / `final_thumb.png` — 테스트 입력 / 기대 결과
-- `TECH.md` — 기술 문서: PSD 스마트 오브젝트 바이너리 구조와 생성 기법
+- `make_psd.py` — main script
+- `layer.json` / `final_thumb.png` — test input / expected result
+- `TECH.md` — technical write-up: the PSD Smart Object binary structure and the generation technique
