@@ -1,8 +1,8 @@
-# Seedream5-Layers-To-Save-PSD
+# Fal.ai-Seedream5-Layers-To-Save-PSD
 
 *다른 언어로 읽기: [English](README.md)*
 
-seedream5pro **layerize** 결과를 **Embedded Smart Objects PSD**로 저장한다 — AI가 분리한 모든 오브젝트 레이어가 납작한 래스터가 아니라, 원본 해상도 그대로 임베드된 진짜 스마트 오브젝트로 들어간다. Photoshop 설치 없이 순수 Python으로 동작한다.
+[fal.ai](https://fal.ai) seedream5pro **layerize** 결과를 **Embedded Smart Objects PSD**로 저장한다 — AI가 분리한 모든 오브젝트 레이어가 납작한 래스터가 아니라, 원본 해상도 그대로 임베드된 진짜 스마트 오브젝트로 들어간다. Photoshop 설치 없이 순수 Python으로 동작한다.
 
 ## 개요
 

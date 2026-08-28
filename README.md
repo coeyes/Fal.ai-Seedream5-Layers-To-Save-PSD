@@ -1,8 +1,8 @@
-# Seedream5-Layers-To-Save-PSD
+# Fal.ai-Seedream5-Layers-To-Save-PSD
 
 *Read this in other languages: [한국어](README.ko.md)*
 
-Saves a seedream5pro **layerize** result as a PSD with **Embedded Smart Objects** — every AI-separated object layer is embedded at its original resolution as a true Smart Object, not a flattened raster. Runs on pure Python — no Photoshop installation required.
+Saves a [fal.ai](https://fal.ai) seedream5pro **layerize** result as a PSD with **Embedded Smart Objects** — every AI-separated object layer is embedded at its original resolution as a true Smart Object, not a flattened raster. Runs on pure Python — no Photoshop installation required.
 
 ## Overview
 

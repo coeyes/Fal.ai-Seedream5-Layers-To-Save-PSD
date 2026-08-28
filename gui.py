@@ -1,4 +1,4 @@
-"""Seedream5-Layers-To-Save-PSD GUI.
+"""Fal.ai-Seedream5-Layers-To-Save-PSD GUI.
 
 layerize JSON을 붙여넣고 Run을 누르면 make_psd.build_psd로 PSD를 생성한다.
 사양은 GUI_SPEC.md 참조.
@@ -18,7 +18,7 @@ from make_psd import build_psd
 
 STRINGS = {
     'en': {
-        'title': 'Seedream5-Layers-To-Save-PSD',
+        'title': 'Fal.ai-Seedream5-Layers-To-Save-PSD',
         'lang_label': 'Language:',
         'json_label': 'Layerize JSON:',
         'out_folder': 'Output folder:',
@@ -36,7 +36,7 @@ STRINGS = {
         'error': 'Error: {}',
     },
     'ko': {
-        'title': 'Seedream5-Layers-To-Save-PSD',
+        'title': 'Fal.ai-Seedream5-Layers-To-Save-PSD',
         'lang_label': '언어:',
         'json_label': 'Layerize JSON:',
         'out_folder': '출력 폴더:',
@@ -54,7 +54,7 @@ STRINGS = {
         'error': '오류: {}',
     },
     'ja': {
-        'title': 'Seedream5-Layers-To-Save-PSD',
+        'title': 'Fal.ai-Seedream5-Layers-To-Save-PSD',
         'lang_label': '言語:',
         'json_label': 'Layerize JSON:',
         'out_folder': '出力フォルダ:',
