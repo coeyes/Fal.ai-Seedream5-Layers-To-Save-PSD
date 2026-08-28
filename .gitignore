@@ -1,0 +1,19 @@
+# venv
+.venv/
+
+# 입력 (layerize JSON, 기대 썸네일)
+*.json
+*.png
+
+# 출력
+*.psd
+*_layers/
+
+# 임시 작업 (역공학·디버깅 스크래치)
+_ref/
+_dl/
+__pycache__/
+
+# 아카이브/백업
+*.7z
+*.zip
