@@ -39,7 +39,7 @@ uv pip install -r requirements.txt
 
 psd-tools는 스마트 오브젝트 *생성*을 공식 지원하지 않는다. 이 도구는 psd-tools의 저수준 직렬화 계층을 이용해 스마트 오브젝트 블록(`SoLd`, `PlLd`, 전역 `lnk2`)을 직접 조립한다. 디스크립터 구조는 Photoshop이 실제로 기록한 바이너리를 base64 템플릿으로 임베드해 두고, uuid·트랜스폼·크기만 런타임에 패치하는 방식이라 견고하다.
 
-또한 psd-tools의 알려지지 않은 버그 — `LinkedLayer` v8 꼬리의 `contentID` 디스크립터를 누락 기록해 **Photoshop이 파일을 아예 열지 못하게 되는 문제** — 를 `LinkedLayerV8` 서브클래스로 우회한다. 상세한 역공학 기록과 인수인계 정보는 [HANDOFF.md](HANDOFF.md) 참조.
+또한 psd-tools의 알려지지 않은 버그 — `LinkedLayer` v8 꼬리의 `contentID` 디스크립터를 누락 기록해 **Photoshop이 파일을 아예 열지 못하게 되는 문제** — 를 `LinkedLayerV8` 서브클래스로 우회한다. 포맷 구조, 템플릿 패치 전략, 버그 규명 과정 등 기술 상세는 [TECH.md](TECH.md) 참조.
 
 ## 검증
 
@@ -49,5 +49,4 @@ Photoshop 27.6에서 실제로 열어 8개 레이어 전부 `LayerKind.SMARTOBJE
 
 - `make_psd.py` — 메인 스크립트
 - `layer.json` / `final_thumb.png` — 테스트 입력 / 기대 결과
-- `_ref/` — 포맷 역공학·검증 스크립트와 참조 PSD (개발·디버깅용, 실행에는 불필요)
-- `HANDOFF.md` — 기술 상세·인수인계 문서
+- `TECH.md` — 기술 문서: PSD 스마트 오브젝트 바이너리 구조와 생성 기법

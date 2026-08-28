@@ -17,3 +17,6 @@ __pycache__/
 # 아카이브/백업
 *.7z
 *.zip
+
+# 내부 인수인계 문서 (공개용은 TECH.md)
+HANDOFF.md
