@@ -4,6 +4,8 @@
 
 Saves a fal.ai [Seedream 5 Pro **Layerize**](https://fal.ai/models/bytedance/seedream/v5/pro/layerize) result as a PSD with **Embedded Smart Objects** — every AI-separated object layer is embedded at its original resolution as a true Smart Object, not a flattened raster. Runs on pure Python — no Photoshop installation required.
 
+**⬇ Download:** grab the standalone Windows exe from the [latest release](https://github.com/coeyes/Fal.ai-Seedream5-Layers-To-Save-PSD/releases/latest) — no Python install needed.
+
 ## Overview
 
 [Seedream 5 Pro Layerize](https://fal.ai/models/bytedance/seedream/v5/pro/layerize) decomposes a single image into per-object layers (transparent PNGs) using AI, and returns a JSON describing each layer's URL, name, and placement (bounding box). This tool takes that JSON and:
