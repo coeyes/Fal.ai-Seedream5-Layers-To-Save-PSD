@@ -11,8 +11,9 @@ import queue
 import sys
 import threading
 import tkinter as tk
+import webbrowser
 from pathlib import Path
-from tkinter import filedialog, ttk
+from tkinter import filedialog, font as tkfont, ttk
 
 from make_psd import build_psd
 
@@ -74,6 +75,9 @@ STRINGS = {
 }
 LANG_NAMES = {'English': 'en', '한국어': 'ko', '日本語': 'ja'}
 
+MODEL_LINK_TEXT = 'fal.ai › Seedream 5 Pro Layerize ↗'
+MODEL_LINK_URL = 'https://fal.ai/models/bytedance/seedream/v5/pro/layerize'
+
 
 def resource_path(name: str) -> Path:
     return Path(getattr(sys, '_MEIPASS', Path(__file__).parent)) / name
@@ -111,13 +115,23 @@ class App:
             root.iconphoto(True, tk.PhotoImage(file=str(icon)))
         root.minsize(560, 640)
         root.columnconfigure(0, weight=1)
-        root.rowconfigure(1, weight=1)
+        root.rowconfigure(2, weight=1)
 
         pad = {'padx': 8, 'pady': 4}
 
+        # 최상단: 모델 페이지 바로가기 링크
+        link_font = tkfont.nametofont('TkDefaultFont').copy()
+        link_font.configure(underline=True)
+        link = ttk.Label(
+            root, text=MODEL_LINK_TEXT, foreground='#0066cc',
+            font=link_font, cursor='hand2',
+        )
+        link.grid(row=0, column=0, sticky='w', padx=8, pady=(6, 0))
+        link.bind('<Button-1>', lambda e: webbrowser.open(MODEL_LINK_URL))
+
         # 상단: 언어 선택
         top = ttk.Frame(root)
-        top.grid(row=0, column=0, sticky='ew', **pad)
+        top.grid(row=1, column=0, sticky='ew', **pad)
         self.lang_label = ttk.Label(top)
         self.lang_label.pack(side='left')
         self.lang_combo = ttk.Combobox(
@@ -131,7 +145,7 @@ class App:
 
         # JSON 영역 (stretch, mono 폰트)
         jf = ttk.Frame(root)
-        jf.grid(row=1, column=0, sticky='nsew', **pad)
+        jf.grid(row=2, column=0, sticky='nsew', **pad)
         jf.columnconfigure(0, weight=1)
         jf.rowconfigure(1, weight=1)
         self.json_label = ttk.Label(jf)
@@ -144,7 +158,7 @@ class App:
 
         # 출력 폴더 / 파일명 / 토글
         form = ttk.Frame(root)
-        form.grid(row=2, column=0, sticky='ew', **pad)
+        form.grid(row=3, column=0, sticky='ew', **pad)
         form.columnconfigure(1, weight=1)
         self.out_label = ttk.Label(form)
         self.out_label.grid(row=0, column=0, sticky='w')
@@ -166,13 +180,13 @@ class App:
 
         # Run 버튼
         self.run_btn = ttk.Button(root, command=self.on_run)
-        self.run_btn.grid(row=3, column=0, sticky='e', **pad)
+        self.run_btn.grid(row=4, column=0, sticky='e', **pad)
 
         # Status 로그 (read-only 4줄)
         self.status = tk.Text(
             root, height=4, state='disabled', font='TkDefaultFont', wrap='word'
         )
-        self.status.grid(row=4, column=0, sticky='ew', **pad)
+        self.status.grid(row=5, column=0, sticky='ew', **pad)
         self.status.tag_configure('ok', foreground='#008000')
         self.status.tag_configure('err', foreground='#c00000')
 
