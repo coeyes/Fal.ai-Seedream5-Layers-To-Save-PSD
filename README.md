@@ -1,8 +1,8 @@
-# seedream5_layer
+# Seedream5-Layers-To-Save PSD
 
 *Read this in other languages: [한국어](README.ko.md)*
 
-A tool that takes a seedream5pro **layerize** result JSON and builds a PSD where each AI-separated object layer is an **embedded Smart Object**. Runs on pure Python — no Photoshop installation required.
+Saves a seedream5pro **layerize** result as a PSD with **Embedded Smart Objects** — every AI-separated object layer is embedded at its original resolution as a true Smart Object, not a flattened raster. Runs on pure Python — no Photoshop installation required.
 
 ## Overview
 
