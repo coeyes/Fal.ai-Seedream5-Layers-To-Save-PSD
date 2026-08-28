@@ -84,3 +84,10 @@ Opened the output in Photoshop 27.6: all 8 layers are recognized as `LayerKind.S
 - `gui.py` — tkinter GUI wrapper
 - `layer.json` / `final_thumb.png` — test input / expected result
 - `TECH.md` — technical write-up: the PSD Smart Object binary structure and the generation technique
+- `CHANGELOG.md` — release history
+
+## License / Author
+
+MIT License — see [LICENSE](LICENSE).
+
+Author: **Hyeongjik Song** <coeyes@gmail.com>

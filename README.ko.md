@@ -84,3 +84,10 @@ Photoshop 27.6에서 실제로 열어 8개 레이어 전부 `LayerKind.SMARTOBJE
 - `gui.py` — tkinter GUI 래퍼
 - `layer.json` / `final_thumb.png` — 테스트 입력 / 기대 결과
 - `TECH.md` / `TECH.ko.md` — 기술 문서: PSD 스마트 오브젝트 바이너리 구조와 생성 기법
+- `CHANGELOG.md` — 릴리즈 이력
+
+## 라이선스 / 저자
+
+MIT License — [LICENSE](LICENSE) 참조.
+
+저자: **Hyeongjik Song** <coeyes@gmail.com>
