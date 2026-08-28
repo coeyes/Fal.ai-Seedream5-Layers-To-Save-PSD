@@ -3,6 +3,8 @@
 usage: python make_psd.py layer.json [-o output.psd]
 """
 
+__version__ = '1.0.0'
+
 import argparse
 import base64
 import io
@@ -185,6 +187,7 @@ def build_psd(
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument('--version', action='version', version=f'%(prog)s {__version__}')
     ap.add_argument('json_path', help='layerize 결과 JSON 파일')
     ap.add_argument(
         '-o', '--output', default=None,

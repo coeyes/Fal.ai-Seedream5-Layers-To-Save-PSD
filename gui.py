@@ -15,7 +15,7 @@ import webbrowser
 from pathlib import Path
 from tkinter import filedialog, font as tkfont, ttk
 
-from make_psd import build_psd
+from make_psd import __version__, build_psd
 
 STRINGS = {
     'en': {
@@ -203,7 +203,7 @@ class App:
         self.apply_language()
 
     def apply_language(self) -> None:
-        self.root.title(self.tr('title'))
+        self.root.title(f'{self.tr("title")} v{__version__}')
         self.lang_label.configure(text=self.tr('lang_label'))
         self.json_label.configure(text=self.tr('json_label'))
         self.out_label.configure(text=self.tr('out_folder'))
