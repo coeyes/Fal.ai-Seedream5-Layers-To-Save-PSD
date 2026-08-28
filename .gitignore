@@ -4,6 +4,8 @@
 # 입력 (layerize JSON, 기대 썸네일)
 *.json
 *.png
+# 단 README용 이미지는 추적
+!assets/*.png
 
 # 출력
 *.psd

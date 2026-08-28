@@ -14,7 +14,28 @@ fal.ai [Seedream 5 Pro **Layerize**](https://fal.ai/models/bytedance/seedream/v5
 
 레이어 PNG는 최종 배치 크기보다 약 2배 고해상도라서, 스마트 오브젝트로 임베드하면 포토샵에서 확대·재배치해도 화질 손실이 없다.
 
-## 사용법
+## fal.ai에서 JSON 가져오기
+
+1. fal.ai 플레이그라운드에서 [Seedream 5 Pro Layerize](https://fal.ai/models/bytedance/seedream/v5/pro/layerize)를 실행한다.
+2. Result가 **Completed**가 되면 결과 보기를 **JSON**으로 전환한다 (아래 빨간 박스):
+
+   ![결과 보기를 JSON으로 전환](assets/fal-layerize-01.png)
+
+3. JSON 전체를 복사한다 — 패널에 복사 버튼이 있다 (아래 빨간 박스):
+
+   ![결과 JSON 복사](assets/fal-layerize-02.png)
+
+## GUI
+
+```bat
+python gui.py
+```
+
+![GUI](assets/gui.png)
+
+복사한 JSON을 텍스트 영역에 붙여넣고, 출력 폴더와 파일명을 정한 뒤 **실행**을 누르면 된다. 진행 상황과 결과는 하단 status 로그에 표시된다. UI 언어: English / 한국어 / 日本語 (OS 로케일 자동 감지).
+
+## CLI
 
 ```bat
 .venv\Scripts\activate
@@ -49,6 +70,7 @@ Photoshop 27.6에서 실제로 열어 8개 레이어 전부 `LayerKind.SMARTOBJE
 
 ## 파일
 
-- `make_psd.py` — 메인 스크립트
+- `make_psd.py` — 코어 / CLI 스크립트
+- `gui.py` — tkinter GUI 래퍼
 - `layer.json` / `final_thumb.png` — 테스트 입력 / 기대 결과
 - `TECH.md` / `TECH.ko.md` — 기술 문서: PSD 스마트 오브젝트 바이너리 구조와 생성 기법

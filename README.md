@@ -14,7 +14,28 @@ Saves a fal.ai [Seedream 5 Pro **Layerize**](https://fal.ai/models/bytedance/see
 
 The layer PNGs are roughly 2× higher resolution than their final placement size, so embedding them as Smart Objects means no quality loss when scaling or repositioning them later in Photoshop.
 
-## Usage
+## Getting the JSON from fal.ai
+
+1. Run [Seedream 5 Pro Layerize](https://fal.ai/models/bytedance/seedream/v5/pro/layerize) on the fal.ai playground.
+2. When the Result shows **Completed**, switch the result view to **JSON** (red box below):
+
+   ![Switch the result view to JSON](assets/fal-layerize-01.png)
+
+3. Copy the whole JSON — the panel has a copy button (red box below):
+
+   ![Copy the result JSON](assets/fal-layerize-02.png)
+
+## GUI
+
+```bat
+python gui.py
+```
+
+![GUI](assets/gui.png)
+
+Paste the copied JSON into the text area, pick the output folder and file name, then hit **Run**. Progress and results stream into the status log at the bottom. UI languages: English / 한국어 / 日本語 (auto-detected from the OS).
+
+## CLI
 
 ```bat
 .venv\Scripts\activate
@@ -49,6 +70,7 @@ Opened the output in Photoshop 27.6: all 8 layers are recognized as `LayerKind.S
 
 ## Files
 
-- `make_psd.py` — main script
+- `make_psd.py` — core / CLI script
+- `gui.py` — tkinter GUI wrapper
 - `layer.json` / `final_thumb.png` — test input / expected result
 - `TECH.md` — technical write-up: the PSD Smart Object binary structure and the generation technique
