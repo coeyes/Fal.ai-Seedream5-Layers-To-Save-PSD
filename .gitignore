@@ -18,5 +18,6 @@ __pycache__/
 *.7z
 *.zip
 
-# 내부 인수인계 문서 (공개용은 TECH.md)
+# 내부 문서 (공개용은 TECH.md)
 HANDOFF.md
+GUI_SPEC.md

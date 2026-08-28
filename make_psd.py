@@ -101,36 +101,28 @@ def safe_filename(name: str, used: set[str]) -> str:
     return s
 
 
-def main() -> None:
-    ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument('json_path', help='layerize 결과 JSON 파일')
-    ap.add_argument(
-        '-o', '--output', default=None,
-        help='출력 PSD 경로 (기본: <json 파일명>.psd)',
-    )
-    ap.add_argument(
-        '--gen-layers-folder', type=int, choices=(0, 1), default=1,
-        help='1이면 <output.psd>_layers 폴더에 <zindex>_<layername>.png 저장 (기본 1)',
-    )
-    args = ap.parse_args()
-    if args.output is None:
-        args.output = Path(args.json_path).stem + '.psd'
-
-    with open(args.json_path, encoding='utf-8') as f:
-        layers = sorted(json.load(f)['layers'], key=lambda x: x['z_index'])
+def build_psd(
+    data: dict,
+    output: str | Path,
+    gen_layers_folder: bool = True,
+    progress=print,
+) -> Path:
+    """layerize JSON dict로 PSD를 생성한다. 진행 상황은 progress 콜백으로 보고."""
+    output = str(output)
+    layers = sorted(data['layers'], key=lambda x: x['z_index'])
 
     used_names: set[str] = set()
     downloads = []
     for lyr in layers:
         name = lyr['name'] or 'background'
         fname = safe_filename(name, used_names)
-        print(f'download: {name}')
+        progress(f'download: {name}')
         png = urllib.request.urlopen(lyr['image']['url'], timeout=120).read()
         downloads.append((lyr, name, fname, png, Image.open(io.BytesIO(png)).convert('RGBA')))
 
     layers_dir = None
-    if args.gen_layers_folder:
-        layers_dir = Path(args.output + '_layers')
+    if gen_layers_folder:
+        layers_dir = Path(output + '_layers')
         layers_dir.mkdir(exist_ok=True)
 
     canvas = downloads[0][4].size  # z_index 0 배경이 캔버스 크기 기준
@@ -184,10 +176,31 @@ def main() -> None:
         key=Tag.LINKED_LAYER2, data=linked
     )
 
-    psd.save(args.output)
-    print(f'saved: {args.output} ({canvas[0]}x{canvas[1]}, {len(downloads)} layers)')
+    psd.save(output)
+    progress(f'saved: {output} ({canvas[0]}x{canvas[1]}, {len(downloads)} layers)')
     if layers_dir is not None:
-        print(f'layers folder: {layers_dir}')
+        progress(f'layers folder: {layers_dir}')
+    return Path(output)
+
+
+def main() -> None:
+    ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument('json_path', help='layerize 결과 JSON 파일')
+    ap.add_argument(
+        '-o', '--output', default=None,
+        help='출력 PSD 경로 (기본: <json 파일명>.psd)',
+    )
+    ap.add_argument(
+        '--gen-layers-folder', type=int, choices=(0, 1), default=1,
+        help='1이면 <output.psd>_layers 폴더에 <zindex>_<layername>.png 저장 (기본 1)',
+    )
+    args = ap.parse_args()
+    if args.output is None:
+        args.output = Path(args.json_path).stem + '.psd'
+
+    with open(args.json_path, encoding='utf-8') as f:
+        data = json.load(f)
+    build_psd(data, args.output, bool(args.gen_layers_folder))
 
 
 if __name__ == '__main__':
