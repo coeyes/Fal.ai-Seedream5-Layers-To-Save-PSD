@@ -2,11 +2,11 @@
 
 *Read this in other languages: [한국어](README.ko.md)*
 
-Saves a [fal.ai](https://fal.ai) seedream5pro **layerize** result as a PSD with **Embedded Smart Objects** — every AI-separated object layer is embedded at its original resolution as a true Smart Object, not a flattened raster. Runs on pure Python — no Photoshop installation required.
+Saves a fal.ai [Seedream 5 Pro **Layerize**](https://fal.ai/models/bytedance/seedream/v5/pro/layerize) result as a PSD with **Embedded Smart Objects** — every AI-separated object layer is embedded at its original resolution as a true Smart Object, not a flattened raster. Runs on pure Python — no Photoshop installation required.
 
 ## Overview
 
-seedream5pro layerize decomposes a single image into per-object layers (transparent PNGs) using AI, and returns a JSON describing each layer's URL, name, and placement (bounding box). This tool takes that JSON and:
+[Seedream 5 Pro Layerize](https://fal.ai/models/bytedance/seedream/v5/pro/layerize) decomposes a single image into per-object layers (transparent PNGs) using AI, and returns a JSON describing each layer's URL, name, and placement (bounding box). This tool takes that JSON and:
 
 1. Downloads each layer PNG
 2. Creates a PSD canvas sized to the `z_index=0` layer (the background; its name is `null`, so it becomes `background`)

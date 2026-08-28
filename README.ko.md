@@ -2,11 +2,11 @@
 
 *다른 언어로 읽기: [English](README.md)*
 
-[fal.ai](https://fal.ai) seedream5pro **layerize** 결과를 **Embedded Smart Objects PSD**로 저장한다 — AI가 분리한 모든 오브젝트 레이어가 납작한 래스터가 아니라, 원본 해상도 그대로 임베드된 진짜 스마트 오브젝트로 들어간다. Photoshop 설치 없이 순수 Python으로 동작한다.
+fal.ai [Seedream 5 Pro **Layerize**](https://fal.ai/models/bytedance/seedream/v5/pro/layerize) 결과를 **Embedded Smart Objects PSD**로 저장한다 — AI가 분리한 모든 오브젝트 레이어가 납작한 래스터가 아니라, 원본 해상도 그대로 임베드된 진짜 스마트 오브젝트로 들어간다. Photoshop 설치 없이 순수 Python으로 동작한다.
 
 ## 개요
 
-seedream5pro layerize는 한 장의 이미지를 AI로 오브젝트별 레이어(투명 PNG)로 분해하고, 각 레이어의 URL·이름·배치 정보(bounding box)를 JSON으로 내려준다. 이 도구는 그 JSON을 받아:
+[Seedream 5 Pro Layerize](https://fal.ai/models/bytedance/seedream/v5/pro/layerize)는 한 장의 이미지를 AI로 오브젝트별 레이어(투명 PNG)로 분해하고, 각 레이어의 URL·이름·배치 정보(bounding box)를 JSON으로 내려준다. 이 도구는 그 JSON을 받아:
 
 1. 각 레이어 PNG를 다운로드하고
 2. `z_index=0`(배경, 이름 없음 → `background`) 크기로 PSD 캔버스를 만들고
