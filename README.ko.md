@@ -1,4 +1,4 @@
-# Seedream5-Layers-To-Save PSD
+# Seedream5-Layers-To-Save-PSD
 
 *다른 언어로 읽기: [English](README.md)*
 
