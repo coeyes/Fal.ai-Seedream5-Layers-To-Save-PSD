@@ -58,6 +58,14 @@ uv pip install -r requirements.txt
 
 Dependencies: `psd-tools`, `pillow` (tested on Python 3.12).
 
+### Building a standalone exe
+
+```bat
+build.bat
+```
+
+Converts `icon.png` to a multi-size `.ico` and packages the GUI with PyInstaller into `dist\Fal.ai-Seedream5-Layers-To-Save-PSD.exe` (single file, no console).
+
 ## How it works (summary)
 
 psd-tools does not officially support *creating* Smart Objects. This tool uses psd-tools' low-level serialization layer to assemble the Smart Object blocks (`SoLd`, `PlLd`, and the global `lnk2`) directly. The descriptor structures are embedded as base64 templates captured from binaries actually written by Photoshop, with only the UUIDs, transform, and sizes patched at runtime — which makes the approach robust.

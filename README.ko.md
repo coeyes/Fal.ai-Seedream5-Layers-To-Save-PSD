@@ -58,6 +58,14 @@ uv pip install -r requirements.txt
 
 의존성: `psd-tools`, `pillow` (Python 3.12에서 테스트).
 
+### 단독 실행 exe 빌드
+
+```bat
+build.bat
+```
+
+`icon.png`를 멀티 사이즈 `.ico`로 변환한 뒤 PyInstaller로 GUI를 `dist\Fal.ai-Seedream5-Layers-To-Save-PSD.exe` (단일 파일, 콘솔 없음)로 패키징한다.
+
 ## 동작 원리 (요약)
 
 psd-tools는 스마트 오브젝트 *생성*을 공식 지원하지 않는다. 이 도구는 psd-tools의 저수준 직렬화 계층을 이용해 스마트 오브젝트 블록(`SoLd`, `PlLd`, 전역 `lnk2`)을 직접 조립한다. 디스크립터 구조는 Photoshop이 실제로 기록한 바이너리를 base64 템플릿으로 임베드해 두고, uuid·트랜스폼·크기만 런타임에 패치하는 방식이라 견고하다.

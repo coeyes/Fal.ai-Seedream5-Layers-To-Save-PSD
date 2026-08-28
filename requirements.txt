@@ -1,2 +1,4 @@
 psd-tools
 pillow
+# build-time only (exe packaging)
+pyinstaller

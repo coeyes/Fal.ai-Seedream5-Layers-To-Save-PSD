@@ -4,8 +4,15 @@
 # 입력 (layerize JSON, 기대 썸네일)
 *.json
 *.png
-# 단 README용 이미지는 추적
+# 단 README용 이미지와 앱 아이콘은 추적
 !assets/*.png
+!icon.png
+
+# PyInstaller 빌드 산출물
+build/
+dist/
+*.spec
+icon.ico
 
 # 출력
 *.psd
