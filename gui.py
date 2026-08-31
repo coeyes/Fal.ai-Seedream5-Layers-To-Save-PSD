@@ -197,8 +197,9 @@ class App:
             row=6, column=0, sticky='e', padx=8, pady=(0, 4)
         )
 
+        self.log_pristine = False
         self.apply_language()
-        self.log(self.tr('status_ready'))
+        self.log(self.tr('status_ready'), pristine=True)
         root.after(100, self.poll)
 
     # --- i18n ---
@@ -220,13 +221,20 @@ class App:
         self.run_btn.configure(
             text=self.tr('running') if self.running else self.tr('run')
         )
+        # 아직 실행 전이면 "준비됨" 메시지도 새 언어로 교체
+        if self.log_pristine:
+            self.status.configure(state='normal')
+            self.status.delete('1.0', 'end')
+            self.status.configure(state='disabled')
+            self.log(self.tr('status_ready'), pristine=True)
 
     # --- status log (메인 스레드 전용) ---
-    def log(self, msg: str, tag: str | None = None) -> None:
+    def log(self, msg: str, tag: str | None = None, pristine: bool = False) -> None:
         self.status.configure(state='normal')
         self.status.insert('end', msg + '\n', tag or ())
         self.status.see('end')
         self.status.configure(state='disabled')
+        self.log_pristine = pristine
 
     # --- actions ---
     def on_browse(self) -> None:
