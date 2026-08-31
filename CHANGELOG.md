@@ -13,6 +13,9 @@ All notable changes to this project will be documented in this file.
 ### Changed
 - Platform-aware mono font for the JSON area (Consolas on Windows, Menlo on macOS)
 
+### Fixed
+- GUI: the ready status message now relocalizes when switching UI language
+
 ## [1.0.0] - 2026-08-28
 
 First release.
