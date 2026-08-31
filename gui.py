@@ -192,6 +192,11 @@ class App:
         self.status.tag_configure('ok', foreground='#008000')
         self.status.tag_configure('err', foreground='#c00000')
 
+        # 최하단 버전 표기
+        ttk.Label(root, text=f'v{__version__}', foreground='#888888').grid(
+            row=6, column=0, sticky='e', padx=8, pady=(0, 4)
+        )
+
         self.apply_language()
         self.log(self.tr('status_ready'))
         root.after(100, self.poll)
