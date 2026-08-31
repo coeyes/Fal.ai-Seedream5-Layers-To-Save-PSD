@@ -90,4 +90,5 @@ Opened the output in Photoshop 27.6: all 8 layers are recognized as `LayerKind.S
 
 MIT License — see [LICENSE](LICENSE).
 
-Author: **Hyeongjik Song** <coeyes@gmail.com>
+Author: **Hyeongjik Song** <coeyes@gmail.com>, [<img src="assets/studio-animal-logo-full.svg" alt="studio animal logo" height="25">Studio Animal Inc.](http://www.studioanimal.co.kr/)
+
