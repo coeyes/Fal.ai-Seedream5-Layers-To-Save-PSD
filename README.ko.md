@@ -4,7 +4,11 @@
 
 fal.ai [Seedream 5 Pro **Layerize**](https://fal.ai/models/bytedance/seedream/v5/pro/layerize) 결과를 **Embedded Smart Objects PSD**로 저장한다 — AI가 분리한 모든 오브젝트 레이어가 납작한 래스터가 아니라, 원본 해상도 그대로 임베드된 진짜 스마트 오브젝트로 들어간다. Photoshop 설치 없이 순수 Python으로 동작한다.
 
-**⬇ 다운로드:** [최신 릴리즈](https://github.com/coeyes/Fal.ai-Seedream5-Layers-To-Save-PSD/releases/latest)에서 단독 실행 Windows exe를 받을 수 있다 — Python 설치 불필요.
+**⬇ 다운로드:** [최신 릴리즈](https://github.com/coeyes/Fal.ai-Seedream5-Layers-To-Save-PSD/releases/latest)에서 단독 실행 Windows exe / macOS dmg를 받을 수 있다 — Python 설치 불필요.
+
+> **참고 — 바이너리에 코드 서명이 없어서** 첫 실행 시 OS 경고가 뜬다:
+> - **Windows (SmartScreen):** **추가 정보** → **실행** 클릭.
+> - **macOS (Gatekeeper):** 앱을 우클릭 → **열기** → **열기**. 이 옵션이 안 보이면(macOS 15+) 한 번 실행을 시도한 뒤 **시스템 설정 → 개인정보 보호 및 보안**에서 **그래도 열기** 클릭. 터미널 대안: `xattr -d com.apple.quarantine "/Applications/Fal.ai-Seedream5-Layers-To-Save-PSD.app"`
 
 ## 개요
 
