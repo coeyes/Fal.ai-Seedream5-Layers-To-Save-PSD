@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.1] - 2026-08-31
+
+### Added
+- macOS build: `build.sh` (.app bundle + dmg via PyInstaller/hdiutil)
+- GitHub Actions release workflow: publishing a release auto-builds and attaches the Windows exe and macOS dmg
+- Version label in the GUI bottom status area
+- README: first-launch guidance for unsigned binaries (SmartScreen / Gatekeeper)
+
+### Changed
+- Platform-aware mono font for the JSON area (Consolas on Windows, Menlo on macOS)
+
 ## [1.0.0] - 2026-08-28
 
 First release.
@@ -16,4 +27,5 @@ First release.
 - `build.bat`: PyInstaller one-file windowed build with `icon.png` → `.ico` conversion
 - Standalone Windows exe published on GitHub Releases
 
+[1.0.1]: https://github.com/coeyes/Fal.ai-Seedream5-Layers-To-Save-PSD/releases/tag/v1.0.1
 [1.0.0]: https://github.com/coeyes/Fal.ai-Seedream5-Layers-To-Save-PSD/releases/tag/v1.0.0
