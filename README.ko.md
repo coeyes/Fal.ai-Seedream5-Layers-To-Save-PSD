@@ -98,4 +98,4 @@ Photoshop 27.6에서 실제로 열어 8개 레이어 전부 `LayerKind.SMARTOBJE
 
 MIT License — [LICENSE](LICENSE) 참조.
 
-저자: **Hyeongjik Song** <coeyes@gmail.com>, [<img src="assets/studio-animal-logo-full.svg" alt="studio animal logo" height="25">Studio Animal Inc.](http://www.studioanimal.co.kr/)
+저자: **Hyeongjik Song** <coeyes@gmail.com>, [<sub><img src="assets/studio-animal-logo-full.svg" alt="studio animal logo" height="25"></sub>Studio Animal Inc.](http://www.studioanimal.co.kr/)
