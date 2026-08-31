@@ -78,6 +78,8 @@ LANG_NAMES = {'English': 'en', '한국어': 'ko', '日本語': 'ja'}
 MODEL_LINK_TEXT = 'fal.ai › Seedream 5 Pro Layerize ↗'
 MODEL_LINK_URL = 'https://fal.ai/models/bytedance/seedream/v5/pro/layerize'
 
+MONO_FONT = ('Consolas' if sys.platform == 'win32' else 'Menlo', 10)
+
 
 def resource_path(name: str) -> Path:
     return Path(getattr(sys, '_MEIPASS', Path(__file__).parent)) / name
@@ -150,7 +152,7 @@ class App:
         jf.rowconfigure(1, weight=1)
         self.json_label = ttk.Label(jf)
         self.json_label.grid(row=0, column=0, sticky='w')
-        self.json_text = tk.Text(jf, font=('Consolas', 10), wrap='none', undo=True)
+        self.json_text = tk.Text(jf, font=MONO_FONT, wrap='none', undo=True)
         self.json_text.grid(row=1, column=0, sticky='nsew')
         sb = ttk.Scrollbar(jf, command=self.json_text.yview)
         sb.grid(row=1, column=1, sticky='ns')

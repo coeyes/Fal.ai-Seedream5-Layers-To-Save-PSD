@@ -60,13 +60,17 @@ uv pip install -r requirements.txt
 
 의존성: `psd-tools`, `pillow` (Python 3.12에서 테스트).
 
-### 단독 실행 exe 빌드
+### 단독 실행 바이너리 빌드
 
 ```bat
-build.bat
+build.bat      @REM Windows: dist\Fal.ai-Seedream5-Layers-To-Save-PSD.exe (단일 파일, 콘솔 없음)
 ```
 
-`icon.png`를 멀티 사이즈 `.ico`로 변환한 뒤 PyInstaller로 GUI를 `dist\Fal.ai-Seedream5-Layers-To-Save-PSD.exe` (단일 파일, 콘솔 없음)로 패키징한다.
+```sh
+bash build.sh  # macOS: dist/Fal.ai-Seedream5-Layers-To-Save-PSD.dmg (.app 포함)
+```
+
+두 스크립트 모두 `icon.png`를 플랫폼 아이콘 포맷으로 변환한 뒤 PyInstaller로 패키징한다. GitHub 릴리즈를 발행하면 [워크플로](.github/workflows/release.yml)가 Windows exe와 macOS dmg를 빌드해 릴리즈에 자동 첨부한다.
 
 ## 동작 원리 (요약)
 

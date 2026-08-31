@@ -1,3 +1,5 @@
 # TODO
 
-- [ ] macOS build: package the GUI as a `.app` bundle (PyInstaller on macOS; convert `icon.png` to `.icns`; verify tkinter/Tk and font fallbacks — Consolas is Windows-only, use Menlo/Monaco on macOS)
+- [x] macOS build — `build.sh` (.app + .dmg) and GitHub Actions release workflow (`.github/workflows/release.yml`)
+- [ ] Verify the macOS .app on a real Mac (Gatekeeper right-click→Open flow, Menlo font rendering)
+- [ ] Code signing / notarization (Apple Developer Program) for the macOS build; optional Authenticode signing for the Windows exe

@@ -1,0 +1,41 @@
+name: Release builds
+
+# Publish a GitHub release -> this workflow builds the Windows exe and the
+# macOS dmg, then attaches both to that release.
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+env:
+  APP_NAME: Fal.ai-Seedream5-Layers-To-Save-PSD
+
+jobs:
+  windows-exe:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements.txt
+      - run: .\build.bat
+        shell: cmd
+      - run: gh release upload ${{ github.event.release.tag_name }} "dist/${{ env.APP_NAME }}.exe" --clobber
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+  macos-dmg:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements.txt
+      - run: bash build.sh
+      - run: gh release upload ${{ github.event.release.tag_name }} "dist/${{ env.APP_NAME }}.dmg" --clobber
+        env:
+          GH_TOKEN: ${{ github.token }}

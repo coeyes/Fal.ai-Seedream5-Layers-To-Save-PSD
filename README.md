@@ -60,13 +60,17 @@ uv pip install -r requirements.txt
 
 Dependencies: `psd-tools`, `pillow` (tested on Python 3.12).
 
-### Building a standalone exe
+### Building standalone binaries
 
 ```bat
-build.bat
+build.bat      @REM Windows: dist\Fal.ai-Seedream5-Layers-To-Save-PSD.exe (single file, no console)
 ```
 
-Converts `icon.png` to a multi-size `.ico` and packages the GUI with PyInstaller into `dist\Fal.ai-Seedream5-Layers-To-Save-PSD.exe` (single file, no console).
+```sh
+bash build.sh  # macOS: dist/Fal.ai-Seedream5-Layers-To-Save-PSD.dmg (.app inside)
+```
+
+Both scripts convert `icon.png` to the platform icon format and package the GUI with PyInstaller. Publishing a GitHub release triggers [a workflow](.github/workflows/release.yml) that builds the Windows exe and macOS dmg and attaches them to the release automatically.
 
 ## How it works (summary)
 
